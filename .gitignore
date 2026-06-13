@@ -1,0 +1,55 @@
+# ==========================================
+# Git Ignore Configuration for dariusuav
+# ==========================================
+
+# --- External Repositories ---
+# PX4-Autopilot is a cloned git repo with its own history and build system.
+# It is best to ignore it here to keep this outer repository clean and lightweight.
+PX4-Autopilot/
+
+# --- Large Binaries & AppImages ---
+# Ignore large precompiled application images (like QGroundControl)
+*.AppImage
+apps/*.AppImage
+
+# --- VS Code Configurations & Workspace Cache ---
+# Ignore VS Code workspace indexing databases (e.g. browse.vc.db is ~1.7GB!)
+.vscode/browse.vc.db*
+.vscode/ipch/
+.vscode/*.log
+.vscode/
+
+# Allow sharing project settings and launch tasks
+!.vscode/settings.json
+!.vscode/c_cpp_properties.json
+!.vscode/launch.json
+!.vscode/tasks.json
+
+# --- Python Cache & Virtual Environments ---
+__pycache__/
+*.py[cod]
+*$py.class
+.ipynb_checkpoints/
+.pytest_cache/
+.mypy_cache/
+
+# Local Python virtual environments
+.venv/
+venv/
+env/
+
+# --- General Build Artifacts ---
+# In case custom C/C++ nodes or components are built in the workspace
+build/
+bin/
+obj/
+*.o
+*.a
+*.so
+*.out
+
+# --- System Specific Files ---
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
