@@ -1,0 +1,14 @@
+<!-- Command to launch -->
+<!-- gz launch gazebosim/P00_GazeboFirstStep/sensor_launch.gzlaunch -->
+
+<?xml version='1.0'?>
+<gz version='1.0'>
+  <executable name='sensor-world'>
+    <command>gz sim gazebosim/P00_GazeboFirstStep/first_robotcar_test.sdf</command>
+  </executable>
+
+  <executable name='lidar_node'>
+    <command>./gazebosim/P00_GazeboFirstStep/build/lidar_node</command>
+  </executable>
+
+</gz>
