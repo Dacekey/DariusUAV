@@ -70,6 +70,17 @@ wget https://s3-us-west-2.amazonaws.com/qgroundcontrol/latest/QGroundControl.App
 chmod +x apps/QGroundControl-x86_64.AppImage
 ```
 
+### 4. Link Custom Gazebo Worlds
+This repository contains custom world definitions (including the pre-loaded `x500` drone and experimental visual markers) under [gazebosim/custom_world/](file:///home/dacekey/dariusuav/gazebosim/custom_world/). For Gazebo Sim and PX4 to locate them, you must symlink these world files into the Gazebo simulation cache directory (`~/.simulation-gazebo/worlds/`):
+
+```bash
+# Ensure the Gazebo worlds directory exists
+mkdir -p ~/.simulation-gazebo/worlds
+
+# Symlink the custom worlds from the workspace
+ln -sf ~/dariusuav/gazebosim/custom_world/*.sdf ~/.simulation-gazebo/worlds/
+```
+
 ---
 
 ## ⚙️ Helper Scripts & Environment Aliases
