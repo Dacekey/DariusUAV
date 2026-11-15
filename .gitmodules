@@ -1,3 +1,3 @@
-[submodule "algorithms/SLAM/visual-slam"]
-	path = algorithms/SLAM/visual-slam
+[submodule "algorithms/V-SLAM/visual-slam"]
+	path = algorithms/V-SLAM/visual-slam
 	url = https://github.com/gaoxiang12/slambook2.git

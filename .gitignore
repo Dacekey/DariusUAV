@@ -7,9 +7,13 @@
 # It is best to ignore it here to keep this outer repository clean and lightweight.
 PX4-Autopilot/
 
+# clovix-uav will be maintained as a separate repository.
+/clovix-uav/
+
 # --- Large Binaries & AppImages ---
 # Ignore large precompiled application images (like QGroundControl) and archives
 *.AppImage
+*.AppImage.bak
 apps/*.AppImage
 *.tar.gz
 *.zip
