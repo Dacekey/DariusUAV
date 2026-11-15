@@ -6,7 +6,8 @@ This repository is a structured development workspace for UAV simulation, autopi
 
 ## 🛠️ System Requirements
 
-- **Operating System:** Ubuntu 24.04 LTS (recommended)
+- **Operating System:** Ubuntu 26.04.1 host with Ubuntu 24.04 Docker containers for PX4/Gazebo (verified setup)
+- **ROS 2:** Lyrical on the Ubuntu 26.04 host
 - **Autopilot Suite:** PX4 Autopilot SITL (v1.15.0+ / Main Branch)
 - **Simulation Engine:** Gazebo Sim (Harmonic / version 8.13+)
 - **Ground Control Station:** QGroundControl (AppImage)
@@ -28,7 +29,7 @@ To keep this repository lightweight and focused on custom code/configurations, s
 ## 🚀 Setup & Installation Guide
 
 ### 1. Clone & Build PX4 Autopilot
-Clone the PX4 Autopilot repository directly into the workspace root and build the SITL targets:
+Clone the PX4 Autopilot repository directly into the workspace root. The native dependency setup and build commands below apply to Ubuntu 24.04; use the container build below on Ubuntu 26.04.
 
 ```bash
 # Clone the repository
@@ -97,26 +98,51 @@ alias uav_av="source ~/dariusuav/scripts/run_alicevision_env.sh"
 alias uav_clr="~/dariusuav/scripts/run_clear_allenv.sh"
 ```
 
+### Ubuntu 26.04 simulation backend
+
+On Ubuntu 26.04, `uav_gzb` and `uav_px4` use Docker automatically. This keeps
+Gazebo Harmonic and the PX4 SITL build in their supported Ubuntu 24.04
+environment. The PX4 binary is built from this repository's checkout, including
+local source changes. The host ROS 2 Lyrical installation remains separate.
+The camera image topic has been successfully bridged into Lyrical on the host
+by setting `GZ_PARTITION=dariusuav` for `ros_gz_bridge`.
+
+Prepare the two images and build PX4 once (or rebuild after changing PX4 source):
+
+```bash
+docker pull px4io/px4-sitl-gazebo:latest
+docker pull px4io/px4-dev-ros2-gazebo:main-jazzy
+./scripts/build_px4_container.sh
+```
+
+Run `uav_gzb --baylands_x500_mono_cam` and `uav_px4 --baylands_x500_mono_cam`
+in separate terminals as below. Gazebo opens through XWayland and uses the
+NVIDIA GPU by default. Set `UAV_GZ_GPU=amd` to use the integrated Radeon GPU,
+or `UAV_GZ_GPU=software` to render on the CPU. Set `UAV_GZ_HEADLESS=1` when a
+window is unnecessary. Both commands use the same Gazebo partition
+(`dariusuav` by default). Set
+`UAV_SIM_BACKEND=native` to use the host Gazebo and PX4 binaries instead.
+When the local PX4 plugin has been built, the NVIDIA mode also uses its NVENC
+H.264 camera encoder for the UDP stream on port 5600.
+
 ---
 
 ## 🚦 How to Run the Simulation
 
-For the most stable viewport camera control, run Gazebo and PX4 SITL using the standalone bind method:
+The verified workflow below uses `baylands_x500_mono_cam`. On Ubuntu 26.04,
+`uav_gzb` and `uav_px4` start Docker containers automatically; no manual
+`docker run` step is needed after the images and PX4 binary are prepared.
 
 ### 1. Launch Gazebo World
-Launch the simulator with your target custom world:
+Launch the custom world:
 ```bash
-uav_gzb --baylands_x500
-# OR
-uav_gzb --aruco_x500
+uav_gzb --baylands_x500_mono_cam
 ```
 
 ### 2. Bind PX4 Autopilot SITL
 Once Gazebo is open and the vehicle model is loaded, run PX4 to bind to the existing simulation entity:
 ```bash
-uav_px4 --baylands_x500
-# OR
-uav_px4 --aruco_x500
+uav_px4 --baylands_x500_mono_cam
 ```
 
 ### 3. Start QGroundControl
@@ -132,8 +158,52 @@ uav_env --open
 python takeoff_land.py
 ```
 
-### 5. Cleaning Up Simulation Processes
+MAVSDK control with a script was confirmed successful after the update.
+`takeoff_land.py` is the example script available in this workspace; the exact
+script used for that confirmation was not recorded.
+
+### 5. Inspect and view the camera
+
+Check the Gazebo image topic from the Ubuntu host:
+
+```bash
+GZ_PARTITION=dariusuav gz topic -l | grep image
+```
+
+To view it directly in Gazebo, open **Plugins → Image Display** and select
+`/world/baylands_x500_mono_cam/model/x500/link/camera_link/sensor/camera/image`.
+
+To view it through ROS 2 Lyrical, run these in separate host terminals:
+
+```bash
+# Bridge terminal
+source_global_ros2
+GZ_PARTITION=dariusuav ros2 run ros_gz_bridge parameter_bridge \
+  '/world/baylands_x500_mono_cam/model/x500/link/camera_link/sensor/camera/image@sensor_msgs/msg/Image[gz.msgs.Image'
+```
+
+```bash
+# ROS graph terminal
+source_global_ros2
+ros2 run rqt_graph rqt_graph
+```
+
+```bash
+# ROS image terminal; select the image topic in the window
+source_global_ros2
+ros2 run rqt_image_view rqt_image_view
+```
+
+`source_global_ros2` is the local zsh alias for `source /opt/ros/lyrical/setup.zsh`.
+The Gazebo/PX4 containers receive the partition from their scripts; the host
+bridge needs it explicitly. Both ROS graph discovery and image display were
+verified after setting the partition.
+
+### 6. Cleaning Up Simulation Processes
 To kill any background simulator or PX4 processes that did not exit properly:
 ```bash
 uav_clr --kill
 ```
+
+For the full Ubuntu 26.04 migration record, see
+[FEAT004](vaults/feats/FEAT004_26.11.15_Ubuntu_26.04_PX4_Gazebo_ROS2_Compatibility.md).
