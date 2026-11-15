@@ -93,6 +93,7 @@ alias uav_gzb="~/dariusuav/scripts/run_gazebo_sim.sh"
 alias uav_px4="~/dariusuav/scripts/run_px4_autopilot.sh"
 alias uav_qgc="~/dariusuav/scripts/run_qgroundcontrol.sh"
 alias uav_env="source ~/dariusuav/scripts/run_conda_virenv.sh"
+alias uav_av="source ~/dariusuav/scripts/run_alicevision_env.sh"
 alias uav_clr="~/dariusuav/scripts/run_clear_allenv.sh"
 ```
 

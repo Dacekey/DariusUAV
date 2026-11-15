@@ -8,9 +8,15 @@
 PX4-Autopilot/
 
 # --- Large Binaries & AppImages ---
-# Ignore large precompiled application images (like QGroundControl)
+# Ignore large precompiled application images (like QGroundControl) and archives
 *.AppImage
 apps/*.AppImage
+*.tar.gz
+*.zip
+alicevision/Meshroom-*/
+alicevision/**/output/
+alicevision/**/MeshroomCache/
+
 
 # --- VS Code Configurations & Workspace Cache ---
 # Ignore VS Code workspace indexing databases (e.g. browse.vc.db is ~1.7GB!)
